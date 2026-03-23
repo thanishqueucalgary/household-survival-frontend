@@ -1,21 +1,54 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './Game.css';
 
 const Game = () => {
-  const { token } = useAuth();
-  // eslint-disable-next-line
-  const iframeRef = useRef(null);
+  const { token }             = useAuth();
+  const canvasRef             = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState(null);
 
-  // Once Unity WebGL build is embedded, pass the token into it
   useEffect(() => {
-    const handleUnityLoaded = () => {
-      if (window.unityInstance && token) {
-        window.unityInstance.SendMessage('APIClient', 'SetToken', token);
-      }
+    const script = document.createElement('script');
+    script.src   = '/Build/HouseholdSurvivalWeb.loader.js';
+
+    script.onload = () => {
+      const config = {
+        dataUrl:            '/Build/HouseholdSurvivalWeb.data.br',
+        frameworkUrl:       '/Build/HouseholdSurvivalWeb.framework.js.br',
+        codeUrl:            '/Build/HouseholdSurvivalWeb.wasm.br',
+        streamingAssetsUrl: 'StreamingAssets',
+        companyName:        'DefaultCompany',
+        productName:        'HouseholdSurvival',
+        productVersion:     '1.0',
+      };
+
+      window.createUnityInstance(canvasRef.current, config, (progress) => {
+        // progress 0→1
+      }).then((unityInstance) => {
+        window.unityInstance = unityInstance;
+        setLoading(false);
+
+        // Pass JWT token into Unity so APIClient.cs can use it
+        if (token) {
+          unityInstance.SendMessage('APIClient', 'SetToken', token);
+        }
+      }).catch((msg) => {
+        setError(msg);
+        setLoading(false);
+      });
     };
-    window.addEventListener('unityLoaded', handleUnityLoaded);
-    return () => window.removeEventListener('unityLoaded', handleUnityLoaded);
+
+    script.onerror = () => {
+      setError('Failed to load game. Please refresh.');
+      setLoading(false);
+    };
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, [token]);
 
   return (
@@ -26,34 +59,25 @@ const Game = () => {
       </div>
 
       <div className="game-container">
-        {/* 
-          When Hangyul sends the WebGL build:
-          1. Drop the Build folder into public/
-          2. Replace the placeholder below with:
-          <iframe
-            ref={iframeRef}
-            src="/Build/index.html"
-            className="game-frame"
-            title="Household Survival Game"
-            allowFullScreen
-          />
-        */}
-        <div className="game-placeholder">
-          <div className="placeholder-content">
-            <div className="game-icon">🎮</div>
-            <h2>Game Loading Area</h2>
-            <p>The Unity WebGL build will be embedded here.</p>
-            <p className="placeholder-sub">
-              Waiting for WebGL build from Hangyul.
-            </p>
-            <div className="build-instructions">
-              <p>When the build is ready:</p>
-              <code>1. Copy Build/ folder into public/</code>
-              <code>2. Uncomment the iframe in Game.js</code>
-              <code>3. Redeploy</code>
-            </div>
+        {loading && (
+          <div className="game-loading">
+            <div className="loading-spinner" />
+            <p>Loading game...</p>
           </div>
-        </div>
+        )}
+        {error && (
+          <div className="game-error">
+            <p>⚠️ {error}</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+          </div>
+        )}
+        <canvas
+          ref={canvasRef}
+          id="unity-canvas"
+          width="960"
+          height="600"
+          style={{ display: loading || error ? 'none' : 'block' }}
+        />
       </div>
 
       <div className="game-phases">
