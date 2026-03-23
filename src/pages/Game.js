@@ -74,9 +74,15 @@ const Game = () => {
         <canvas
           ref={canvasRef}
           id="unity-canvas"
-          width="960"
-          height="600"
-          style={{ display: loading || error ? 'none' : 'block' }}
+          width={1920}
+          height={1080}
+          tabIndex={-1}
+          style={{ 
+            display: loading || error ? 'none' : 'block',
+            width: '100%',
+            height: 'auto',
+            background: '#231F20'
+          }}
         />
       </div>
 
