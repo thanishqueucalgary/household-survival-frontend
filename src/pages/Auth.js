@@ -19,7 +19,6 @@ const Auth = () => {
   const [email, setEmail]             = useState('');
   const [password, setPassword]       = useState('');
   const [username, setUsername]       = useState('');
-  const [countryCode, setCountryCode] = useState('us');
   const [error, setError]             = useState('');
   const [loading, setLoading]         = useState(false);
 
@@ -38,7 +37,7 @@ const Auth = () => {
         navigate('/home');
       } else {
         const res = await axios.post(`${API}/api/auth/register`, {
-          email, password, username, country_code: countryCode
+          email, password, username
         });
         login(res.data.user, res.data.token);
         navigate('/home');
@@ -117,7 +116,7 @@ const Auth = () => {
                 required
               />
             </div>
-
+{/* 
             {!isLogin && (
               <div className="form-group">
                 <label>Country</label>
@@ -135,7 +134,7 @@ const Auth = () => {
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
 
             {error && <div className="auth-error">{error}</div>}
 

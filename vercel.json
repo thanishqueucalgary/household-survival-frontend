@@ -1,25 +1,3 @@
 {
-    "headers": [
-      {
-        "source": "/Build/:file.br",
-        "headers": [
-          { "key": "Content-Encoding", "value": "br" },
-          { "key": "Content-Type", "value": "application/octet-stream" }
-        ]
-      },
-      {
-        "source": "/Build/:file.js.br",
-        "headers": [
-          { "key": "Content-Encoding", "value": "br" },
-          { "key": "Content-Type", "value": "application/javascript" }
-        ]
-      },
-      {
-        "source": "/Build/:file.wasm.br",
-        "headers": [
-          { "key": "Content-Encoding", "value": "br" },
-          { "key": "Content-Type", "value": "application/wasm" }
-        ]
-      }
-    ]
-  }
+  "headers": []
+}
