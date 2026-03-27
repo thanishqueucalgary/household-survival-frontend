@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import './Game.css';
 
@@ -9,24 +9,28 @@ const Game = () => {
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const launchGame = () => {
     setStarted(true);
     setLoading(true);
+
+    // Go fullscreen immediately on click
+    if (containerRef.current?.requestFullscreen) {
+      containerRef.current.requestFullscreen();
+    }
 
     const script = document.createElement('script');
     script.src = '/Build/HouseholdSurvivalWeb.loader.js';
 
     script.onload = () => {
       const config = {
-        dataUrl: '/Build/HouseholdSurvivalWeb.data',
-        frameworkUrl: '/Build/HouseholdSurvivalWeb.framework.js',
-        codeUrl: '/Build/HouseholdSurvivalWeb.wasm',
+        dataUrl:            '/Build/HouseholdSurvivalWeb.data',
+        frameworkUrl:       '/Build/HouseholdSurvivalWeb.framework.js',
+        codeUrl:            '/Build/HouseholdSurvivalWeb.wasm',
         streamingAssetsUrl: 'StreamingAssets',
-        companyName: 'DefaultCompany',
-        productName: 'HouseholdSurvival',
-        productVersion: '1.0',
+        companyName:        'DefaultCompany',
+        productName:        'HouseholdSurvival',
+        productVersion:     '1.0',
       };
 
       window.createUnityInstance(canvasRef.current, config, (progress) => {
@@ -51,14 +55,10 @@ const Game = () => {
 
     document.body.appendChild(script);
 
-    const onFSChange = () => setIsFullscreen(!!document.fullscreenElement);
+    const onFSChange = () => {
+      // optional: could track fullscreen state here if needed later
+    };
     document.addEventListener('fullscreenchange', onFSChange);
-  };
-
-  const enterFullscreen = () => {
-    if (containerRef.current?.requestFullscreen) {
-      containerRef.current.requestFullscreen();
-    }
   };
 
   return (
@@ -78,6 +78,9 @@ const Game = () => {
               <button className="play-now-btn" onClick={launchGame}>
                 ▶ Play Now
               </button>
+              <p className="fullscreen-hint-text">
+                The game will open in fullscreen. Press Esc to exit.
+              </p>
             </div>
           </div>
         )}
@@ -107,15 +110,6 @@ const Game = () => {
           tabIndex={-1}
           style={{ visibility: started && !loading && !error ? 'visible' : 'hidden' }}
         />
-
-        {/* Fullscreen hint — shows after game loads, until fullscreen pressed */}
-        {started && !loading && !error && !isFullscreen && (
-          <div className="fullscreen-hint-wrapper" onClick={enterFullscreen}>
-            <div className="hint-bubble">Click for best experience</div>
-            <div className="hint-arrow">↘</div>
-            <button className="fullscreen-btn" title="Enter Fullscreen">⛶</button>
-          </div>
-        )}
 
       </div>
     </div>
