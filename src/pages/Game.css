@@ -19,14 +19,69 @@
   overflow: hidden;
 }
 
-/* Canvas */
+/* ── Pre-launch overlay ── */
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 60%, #0d2137 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 16px;
+}
+
+.overlay-content {
+  text-align: center;
+  padding: 40px;
+}
+
+.overlay-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.overlay-content h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.overlay-content p {
+  color: #8ab4d4;
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.play-now-btn {
+  padding: 16px 52px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.play-now-btn:hover {
+  background: #3a8ef0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4);
+}
+
+/* ── Canvas ── */
 #unity-canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
 
-/* Loading bar */
+/* ── Loading bar ── */
 #unity-loading-bar {
   position: absolute;
   left: 50%;
@@ -61,7 +116,7 @@
   font-size: 14px;
 }
 
-/* Error */
+/* ── Error ── */
 .game-error {
   position: absolute;
   left: 50%;
@@ -86,7 +141,7 @@
   font-size: 14px;
 }
 
-/* Fullscreen hint in bottom right */
+/* ── Fullscreen hint ── */
 .fullscreen-hint-wrapper {
   position: absolute;
   bottom: 16px;
@@ -110,12 +165,12 @@
 }
 
 .hint-arrow {
-  font-size: 28px;
+  font-size: 26px;
   color: #4a9eff;
-  animation: bounce-diagonal 1s ease-in-out infinite;
   line-height: 1;
   text-align: right;
-  padding-right: 10px;
+  padding-right: 8px;
+  animation: bounce-diagonal 1s ease-in-out infinite;
 }
 
 .fullscreen-btn {

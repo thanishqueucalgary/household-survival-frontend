@@ -6,11 +6,15 @@ const Game = () => {
   const { token } = useAuth();
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const [loading, setLoading] = useState(true);
+  const [started, setStarted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  useEffect(() => {
+  const launchGame = () => {
+    setStarted(true);
+    setLoading(true);
+
     const script = document.createElement('script');
     script.src = '/Build/HouseholdSurvivalWeb.loader.js';
 
@@ -47,13 +51,9 @@ const Game = () => {
 
     document.body.appendChild(script);
 
-    // Track fullscreen changes
-    const onFSChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
+    const onFSChange = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', onFSChange);
-    return () => document.removeEventListener('fullscreenchange', onFSChange);
-  }, [token]);
+  };
 
   const enterFullscreen = () => {
     if (containerRef.current?.requestFullscreen) {
@@ -65,8 +65,25 @@ const Game = () => {
     <div className="game-page">
       <div className="game-container" ref={containerRef}>
 
+        {/* Pre-launch overlay */}
+        {!started && (
+          <div className="game-overlay">
+            <div className="overlay-content">
+              <div className="overlay-icon">🏠</div>
+              <h2>Household Survival</h2>
+              <p>
+                Navigate 7 life phases across 5 countries.<br />
+                Every decision shapes your family's future.
+              </p>
+              <button className="play-now-btn" onClick={launchGame}>
+                ▶ Play Now
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Loading bar */}
-        {loading && !error && (
+        {started && loading && !error && (
           <div id="unity-loading-bar">
             <div id="unity-progress-bar-empty">
               <div id="unity-progress-bar-full" />
@@ -88,16 +105,18 @@ const Game = () => {
           ref={canvasRef}
           id="unity-canvas"
           tabIndex={-1}
+          style={{ visibility: started && !loading && !error ? 'visible' : 'hidden' }}
         />
 
-        {/* Fullscreen hint — only shows when not in fullscreen and game is loaded */}
-        {!loading && !error && !isFullscreen && (
+        {/* Fullscreen hint — shows after game loads, until fullscreen pressed */}
+        {started && !loading && !error && !isFullscreen && (
           <div className="fullscreen-hint-wrapper" onClick={enterFullscreen}>
             <div className="hint-bubble">Click for best experience</div>
             <div className="hint-arrow">↘</div>
             <button className="fullscreen-btn" title="Enter Fullscreen">⛶</button>
           </div>
         )}
+
       </div>
     </div>
   );
