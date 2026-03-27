@@ -3,8 +3,9 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser]   = useState(null);
-  const [token, setToken] = useState(null);
+  const [user, setUser]       = useState(null);
+  const [token, setToken]     = useState(null);
+  const [ready, setReady]     = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem('hs_token');
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
       setToken(savedToken);
       setUser(JSON.parse(savedUser));
     }
+    setReady(true);
   }, []);
 
   const login = (userData, jwtToken) => {
@@ -28,6 +30,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('hs_token');
     localStorage.removeItem('hs_user');
   };
+
+  if (!ready) return null;
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout }}>
