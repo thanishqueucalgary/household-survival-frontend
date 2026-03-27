@@ -7,12 +7,12 @@ import './Leaderboard.css';
 const API = 'https://household-survival-production.up.railway.app';
 
 const COUNTRIES = [
-  { code: '',   name: 'Global',        emoji: '🌍' },
-  { code: 'us', name: 'United States', emoji: '🇺🇸' },
-  { code: 'in', name: 'India',         emoji: '🇮🇳' },
-  { code: 'ke', name: 'Kenya',         emoji: '🇰🇪' },
-  { code: 'se', name: 'Sweden',        emoji: '🇸🇪' },
-  { code: 'br', name: 'Brazil',        emoji: '🇧🇷' },
+  { code: '',   name: 'All Players',     emoji: '🌍' },
+  { code: 'us', name: 'Played as US',    emoji: '🇺🇸' },
+  { code: 'in', name: 'Played as India', emoji: '🇮🇳' },
+  { code: 'ke', name: 'Played as Kenya', emoji: '🇰🇪' },
+  { code: 'se', name: 'Played as Sweden',emoji: '🇸🇪' },
+  { code: 'br', name: 'Played as Brazil',emoji: '🇧🇷' },
 ];
 
 const Leaderboard = () => {
