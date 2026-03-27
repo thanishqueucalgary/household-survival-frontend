@@ -39,8 +39,7 @@
 #unity-logo {
   width: 154px;
   height: 130px;
-  background: url('/TemplateData/unity-logo-dark.png') no-repeat center;
-  background-size: contain;
+  background: #231f20;
 }
 
 #unity-progress-bar-empty {
@@ -105,12 +104,12 @@
 #unity-fullscreen-button {
   width: 28px;
   height: 28px;
-  background: url('/TemplateData/fullscreen-button.png') no-repeat center;
-  background-size: contain;
+  background: #fff;
   border: none;
   cursor: pointer;
   opacity: 0.7;
   transition: opacity 0.2s;
+  border-radius: 4px;
 }
 
 #unity-fullscreen-button:hover {
