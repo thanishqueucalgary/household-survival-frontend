@@ -3,83 +3,92 @@ import { useAuth } from '../context/AuthContext';
 import './Game.css';
 
 const Game = () => {
-  const { token, user } = useAuth();
-  const canvasRef = useRef(null);
-  const unityInstanceRef = useRef(null);
-  const progressRef = useRef(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { token }               = useAuth();
+  const canvasRef               = useRef(null);
+  const containerRef            = useRef(null);
+  const [started, setStarted]   = useState(false);
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState(null);
 
-  useEffect(() => {
-    if (document.getElementById('unity-loader-script')) return;
+  const launchGame = () => {
+    setStarted(true);
+    setLoading(true);
 
     const script = document.createElement('script');
-    script.id = 'unity-loader-script';
     script.src = '/Build/HouseholdSurvivalWeb.loader.js';
 
     script.onload = () => {
       const config = {
-        dataUrl: '/Build/HouseholdSurvivalWeb.data',
-        frameworkUrl: '/Build/HouseholdSurvivalWeb.framework.js',
-        codeUrl: '/Build/HouseholdSurvivalWeb.wasm',
+        dataUrl:            '/Build/HouseholdSurvivalWeb.data',
+        frameworkUrl:       '/Build/HouseholdSurvivalWeb.framework.js',
+        codeUrl:            '/Build/HouseholdSurvivalWeb.wasm',
         streamingAssetsUrl: 'StreamingAssets',
-        companyName: 'DefaultCompany',
-        productName: 'HouseholdSurvival',
-        productVersion: '1.0',
-        devicePixelRatio: window.devicePixelRatio || 1,
+        companyName:        'DefaultCompany',
+        productName:        'HouseholdSurvival',
+        productVersion:     '1.0',
       };
 
       window.createUnityInstance(canvasRef.current, config, (progress) => {
-        if (progressRef.current) {
-          progressRef.current.style.width = 100 * progress + "%";
+        const bar = document.getElementById('unity-progress-bar-full');
+        if (bar) bar.style.width = (progress * 100) + '%';
+      }).then((unityInstance) => {
+        window.unityInstance = unityInstance;
+        setLoading(false);
+
+        // Go fullscreen immediately
+        if (containerRef.current && containerRef.current.requestFullscreen) {
+          containerRef.current.requestFullscreen();
         }
-      })
-        .then((instance) => {
-          unityInstanceRef.current = instance;
-          setLoading(false);
-          
-          // Send auth data immediately upon load
-          if (token) {
-            const userId = user?.id?.toString() ?? '';
-            instance.SendMessage('GameController', 'SetAuthFromReact', `${token}|${userId}`);
-          }
-        })
-        .catch((msg) => {
-          setError(String(msg));
-          setLoading(false);
-        });
+
+        // Pass JWT token into Unity
+        if (token) {
+          unityInstance.SendMessage('GameController', 'SetToken', token);
+        }
+      }).catch((msg) => {
+        setError(msg);
+        setLoading(false);
+      });
+    };
+
+    script.onerror = () => {
+      setError('Failed to load game. Please refresh.');
+      setLoading(false);
     };
 
     document.body.appendChild(script);
-
-    return () => {
-      if (unityInstanceRef.current) {
-        unityInstanceRef.current.Quit().catch(() => {});
-      }
-      const existing = document.getElementById('unity-loader-script');
-      if (existing) document.body.removeChild(existing);
-    };
-  }, [token, user]);
-
-  const handleFullscreen = () => {
-    if (unityInstanceRef.current) {
-      unityInstanceRef.current.SetFullscreen(1);
-    }
   };
 
   return (
     <div className="game-page">
-      <div id="unity-container" className="game-container">
-        {loading && (
-          <div id="unity-loading-bar">
-            <div id="unity-logo"></div>
-            <div id="unity-progress-bar-empty">
-              <div id="unity-progress-bar-full" ref={progressRef}></div>
+      <div className="game-container" ref={containerRef}>
+
+        {/* Pre-launch overlay */}
+        {!started && (
+          <div className="game-overlay">
+            <div className="overlay-content">
+              <div className="overlay-icon">🏠</div>
+              <h2>Household Survival</h2>
+              <p>Navigate 7 life phases across 5 countries.<br />Every decision shapes your family's future.</p>
+              <button className="play-now-btn" onClick={launchGame}>
+                ▶ Play Now
+              </button>
+              <p className="fullscreen-hint">The game will open in fullscreen. Press Esc to exit.</p>
             </div>
-            <p className="loading-text">Loading Household Survival...</p>
           </div>
         )}
 
+        {/* Loading bar */}
+        {started && loading && (
+          <div id="unity-loading-bar">
+            <div id="unity-logo" />
+            <div id="unity-progress-bar-empty">
+              <div id="unity-progress-bar-full" />
+            </div>
+            <p className="loading-text">Loading game...</p>
+          </div>
+        )}
+
+        {/* Error */}
         {error && (
           <div className="game-error">
             <p>⚠️ {error}</p>
@@ -87,24 +96,25 @@ const Game = () => {
           </div>
         )}
 
+        {/* Unity canvas */}
         <canvas
           ref={canvasRef}
           id="unity-canvas"
           tabIndex={-1}
-          style={{ 
-            visibility: loading || error ? 'hidden' : 'visible' 
-          }}
+          style={{ display: started && !loading && !error ? 'block' : 'none' }}
         />
 
-        {/* Footer with Fullscreen Button */}
-        {!loading && !error && (
+        {/* Fullscreen button (only shows when game is running) */}
+        {started && !loading && !error && (
           <div id="unity-footer">
-            <div id="unity-build-title"></div>
-            <button 
-              id="unity-fullscreen-button" 
-              onClick={handleFullscreen}
-              title="Fullscreen"
-            ></button>
+            <button
+              id="unity-fullscreen-button"
+              onClick={() => {
+                if (containerRef.current?.requestFullscreen) {
+                  containerRef.current.requestFullscreen();
+                }
+              }}
+            />
           </div>
         )}
       </div>

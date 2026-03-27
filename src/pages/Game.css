@@ -1,11 +1,11 @@
 .game-page {
   width: 100%;
-  background: #000;
+  background: #0a0a0a;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 24px 0 40px;
   min-height: calc(100vh - 64px);
+  padding: 32px 24px;
 }
 
 .game-container {
@@ -14,17 +14,79 @@
   max-width: 1200px;
   aspect-ratio: 16 / 9;
   background: #231f20;
-  border: 1px solid #1e1e1e;
-  border-radius: 12px;
+  border: 1px solid #222;
+  border-radius: 16px;
   overflow: hidden;
 }
 
+/* ── Overlay ── */
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1a3a5c 60%, #0d2137 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.overlay-content {
+  text-align: center;
+  padding: 40px;
+}
+
+.overlay-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.overlay-content h2 {
+  font-size: 36px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.overlay-content p {
+  color: #8ab4d4;
+  font-size: 16px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.play-now-btn {
+  padding: 16px 48px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+}
+
+.play-now-btn:hover {
+  background: #3a8ef0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(74, 158, 255, 0.4);
+}
+
+.fullscreen-hint {
+  margin-top: 16px !important;
+  font-size: 12px !important;
+  color: #4a6a8a !important;
+}
+
+/* ── Canvas ── */
 #unity-canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
 
+/* ── Loading bar ── */
 #unity-loading-bar {
   position: absolute;
   left: 50%;
@@ -65,6 +127,7 @@
   font-size: 14px;
 }
 
+/* ── Error ── */
 .game-error {
   position: absolute;
   left: 50%;
@@ -88,13 +151,14 @@
   font-size: 14px;
 }
 
+/* ── Footer / fullscreen ── */
 #unity-footer {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 38px;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -104,12 +168,12 @@
 #unity-fullscreen-button {
   width: 28px;
   height: 28px;
-  background: #fff;
+  background: rgba(255,255,255,0.15);
   border: none;
   cursor: pointer;
+  border-radius: 4px;
   opacity: 0.7;
   transition: opacity 0.2s;
-  border-radius: 4px;
 }
 
 #unity-fullscreen-button:hover {
